@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.pr.user.mapper.IUserMapper">
+	<!-- namespace는 어떤 interface를 참조하는지 지정  -->
+	
+	<resultMap type="com.spring.pr.command.UserVO" id="UserMap">
+		<result property="userId" column="u_UserId"/>
+		<result property="userPw" column="u_UserPw"/>
+		<result property="userName" column="u_UserName"/>
+		<result property="totalUserTel" column="u_UserTel"/>
+		<result property="totalUserEmail" column="u_UserEmail"/>
+		<result property="totalUserAddr" column="u_UserAddr"/>
+	</resultMap>
+	
+	<insert id="join">
+		INSERT INTO pruser
+		(u_UserId, u_UserPw, u_UserName, u_UserTel, u_UserEmail, u_UserAddr)
+		VALUES(#{userId}, #{userPw}, #{userName}, #{totalUserTel}, #{totalUserEmail}, #{totalUserAddr})
+	</insert>
+	
+	<select id="login" resultMap="UserMap">
+		SELECT * FROM 
+		WHERE u_UserId = #{userId} AND u_UserPw = #{userPw}
+	</select>
+	
+</mapper>

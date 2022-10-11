@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.spring.mvc.user.repository.IUserMapper">
+
+	<resultMap type="com.spring.mvc.user.model.UserVO" id="UserMap">
+		<result property="regDate" column="reg_date"/>
+		<result property="sessionId" column="session_id"/>
+		<result property="limitTime" column="limit_time"/>
+	</resultMap>
+	
+	<insert id="register">
+		INSERT INTO mvc_user
+		(account, password, name)
+		VALUES(#{account}, #{password}, #{name})
+	</insert>
+	
+	<select id="checkId" resultType="int">
+		SELECT COUNT(*)
+		FROM mvc_user
+		WHERE account = #{account}
+	</select>
+	
+	<select id="selectOne" resultMap="UserMap">
+		SELECT *
+		FROM mvc_user
+		WHERE account = #{account}
+	</select>
+	
+	<delete id="delete">
+		DELETE FROM mvc_user
+		WHERE account = #{account}
+	</delete>
+	
+	<!-- 자동 로그인을 체크한 경우 쿠키값(세션 아이디)과 유효시간을 갱신 -->
+	<update id="keepLogin">
+		UPDATE mvc_user
+		SET session_id = #{sessionId},
+		limit_time = #{limitDate}
+		WHERE account = #{account}		
+	</update>
+	
+	<!-- 
+		자동 로그인을 신청했던 회원이 다시 사이트에 방문 시
+		로컬에 저장된 루키값(세션ID)과 일치하는 회원의 모든 정보를 조회하는 SQL문
+	 -->
+	 <select id="getUserWithSessionId" resultMap="UserMap">
+	 	SELECT * FROM mvc_user
+	 	WHERE session_id = #{sessionId}
+	 </select>
+	
+</mapper>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//APACHE//DTD LOG4J 1.2//EN" "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<!-- 
+		자바를 이용한 백엔드 로직을 작성하다보면 결과를 확인하기 위해
+		System.out.println()을 사용해 왔습니다.
+		System.out.println()은 단순 출력 이상의 기능을 수행할수 없기 떄문에
+		로그에 대한 다양한 기능을 제공하는 log4j 라이브러리를 사용합니다.
+	 -->
+
+	<!-- Appenders -->
+	<!-- appender: 로그의 출력 위치(파일, 콘솔, DB등)를 결정합니다. -->
+	<appender name="console" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p: %c - %m%n" />
+		</layout>
+	</appender>
+	
+	 <!-- 날짜별 로그 파일 생성 -->
+	 <!-- 설정한 기간 단위로 새 파일을 만들어 로그 메세지를 기록합니다. -->
+    <appender name="rollingFile" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="C:/LOG/all.log"/>
+        <param name="Append" value="true"/>
+        <!-- param name="MaxFileSize" value="100MB"/ -->
+        <!-- param name="MaxBackupIndex" value="2"></param -->
+        <param name="DatePattern" value="'.'yyyy-MM-dd"/>
+        <!-- 
+        	%p -> 로그 레벨 출력 (info, error, warn...)
+        	%m -> 로그 메세지 출력
+        	%c -> 전체 패키지명 또는 파일이름(%C -> 클래스 이름)
+        	%d -> 이벤트 발생 시각(yyyy-MM-dd HH:mm:ss)
+        	숫자: 공백, 글자가 차지할 공간. 음수로 주면 좌측 정렬, 양수 주면 우측.
+         -->
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d %p [%C{10}] %m [%X{userId}]%n" />
+        </layout>  
+    </appender>
+    
+    <!-- 날짜별 로그 파일 생성(에러만) -->
+    <appender name="errFile" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="Threshold" value="ERROR"/>
+        <param name="File" value="C:/LOG/error.log"/>
+        <param name="Append" value="true"/>
+        <!-- param name="MaxFileSize" value="100MB"/ -->
+        <!-- param name="MaxBackupIndex" value="2"></param -->
+        <param name="DatePattern" value="'.'yyyy-MM-dd"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d %5p [%C{1}] %m [%X{userId}]%n" />
+        </layout>  
+    </appender>
+	
+	<!-- 
+		log4j의 여러가지 로그 레벨
+		FATAL (가장 높음) - 가장 심각한 문제가 발생할 때 사용.
+		ERROR - 문제가 발생한 상태.
+		WRAN - 오류의 원인이 될 수 있는 메시지.
+		INFO - 상태 변경 같은 실제 어플리케이션의 운영과 관련된 로직.
+		DEBUG - 디버깅 용도
+		TRACE (가장 낮음) - 가장 상세한 로깅 정보를 출력
+	 -->
+	
+	<!-- aop 패키지를 로그 레벨로 추가 -->
+	<logger name="com.spring.myweb.util.aop">
+		<level value="info" />
+	</logger>
+	
+	<!-- Application Loggers -->
+	<logger name="com.spring.myweb">
+		<level value="info" />
+	</logger>
+	
+	<!-- 3rdparty Loggers -->
+	<logger name="org.springframework.core">
+		<level value="info" />
+	</logger>
+	
+	<logger name="org.springframework.beans">
+		<level value="info" />
+	</logger>
+	
+	<logger name="org.springframework.context">
+		<level value="info" />
+	</logger>
+
+	<logger name="org.springframework.web">
+		<level value="info" />
+	</logger>
+
+	<!-- SQL Logger -->
+	<!-- DB 연결에 관련된 이벤트를 기록.(Connection pool 등) -->
+	<logger name="jdbc.connection" additivity="false">
+		<level value="warn" />
+		<appender-ref ref="console" />
+	</logger>
+	
+	<!-- ResultSet를 제외한 모든 jdbc 호출 내역을 기록. -->
+	<logger name="jdbc.audit" additivity="false">
+		<level value="warn" />
+		<appender-ref ref="console" />
+	</logger>
+	
+	<!-- ResultSet를 포함한 모든 jdbc 호출 내역을 기록. -->
+	<logger name="jdbc.resultset" additivity="false">
+		<level value="warn" />
+		<appender-ref ref="console" />
+	</logger>
+	
+	<!-- SQL문만 기록.(?값이 드러납니다.) -->
+	<logger name="jdbc.sqlonly" additivity="false">
+		<level value="info" />
+		<appender-ref ref="console" />
+	</logger>
+	
+	<!-- table 모양으로 조회된 내용을 기록합니다. -->
+	<logger name="jdbc.resultsettable" additivity="false">
+		<level value="info" />
+		<appender-ref ref="console" />
+	</logger>
+	
+	<!-- 해당SQL을 실행시키는데 소요된 시간정보 기록(밀리초) -->
+	<logger name="jdbc.sqltiming" additivity="false"><!-- additivity="false" : 상속된 중복된 내용은 출력되지 않게 해줌. -->
+		<level value="info" />
+		<appender-ref ref="console" /><!-- 출력될 위치 -->
+	</logger>
+
+	<!-- Root Logger -->
+	<root>
+		<priority value="info" />
+		<appender-ref ref="console" />
+		<appender-ref ref="errFile"/>
+		<appender-ref ref="rollingFile"/>
+	</root>
+	
+</log4j:configuration>

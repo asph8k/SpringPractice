@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+	
+	<!-- 자동으로 컨트롤러와 매핑 메소드 탐색 (핸들러 매핑, 핸들러 어댑터 빈 등록) -->
+	<annotation-driven />
+
+	<!-- css, img, js... 의 파일 경로가 복잡할 때 많이 사용합니다. -->
+	<!-- jsp 파일 같은 데서 경로 긴거 일일히 쓰기 귀찮기 때문에 선언. -->
+	<!-- 내부 경로를 숨겨주는 역할도 한다. -->
+	<resources mapping="/resources/**" location="/resources/" />
+	<resources mapping="/img/**" location="/resources/img/" />
+	<resources mapping="/css/**" location="/resources/css/" />
+	<resources mapping="/fonts/**" location="/resources/fonts/" />
+	<resources mapping="/js/**" location="/resources/js/" />
+
+	<!-- 
+		컨트롤러가 리턴한 문자열 앞, 뒤에 적절한 경로를 붙여서
+		화면을 응답할 수 있도록 도와주는 뷰 리졸버이다.
+	 -->
+	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean>
+	
+	<!-- 
+		아노테이션으로 등록된 클래스 객체들을 탐색해 주는 설정태그.
+		base-package에다가는 탐색할 패키지 경로를 쓰시면
+		하위 패키지까지 몽땅 검색해 줍니다.
+	 -->
+	<context:component-scan base-package="com.spring.myweb" />
+	
+<!-- 	<interceptors>
+		<interceptor>
+			<mapping path=""/>
+		</interceptor>
+	</interceptors> -->
+	
+	<!-- 파일 업로드 -->
+	<!-- 
+		반드시 id를 multipartResolver로 선언해야 한다.
+		Multipart 형식으로 전달되는 데이터를 스프링 mvc에서 사용할수 있도록 변환해 주는 객체
+	 -->
+	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- 최대 업로드 가능한 바이트 크기(바이트 단위), value에다가 -1을 주면 제한이 없음을 의미 -->
+		<beans:property name="maxUploadSize" value="1048576"/>
+		<!-- 업로드 요청을 변환할 때 사용할 문자 인코딩 방식 -->
+		<beans:property name="defaultEncoding" value="utf-8" />
+	</beans:bean>
+	
+	<!-- 
+		공통 로그들, 예외 처리 내용들을 기존 클래스와 분리해서 객체 지향적으로 사용하기 위해
+		Aspect(공통 로직들)와 Target(Service 클래스들, 메소드들)을 연결할 수 있도록
+		가상 환경을 구축해 주는 빈.
+	 -->
+	 <aop:aspectj-autoproxy />
+	
+</beans:beans>
